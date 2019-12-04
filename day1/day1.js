@@ -102,7 +102,7 @@ const input = [
 ];
 
 function fuelRequired(mass) {
-  const fuel = Math.floor(mass / 3)  - 2;
+  const fuel = Math.floor(mass / 3) - 2;
   return (fuel <= 0 ? 0 : fuel);
 }
 
@@ -114,12 +114,8 @@ function totalFuelRequiredPerMass(fuelMass, total) {
   return total;
 }
 
-const fuelRequirementsPerModule = input.map(mass => {
-  return fuelRequired(mass);
-});
+const result = input
+  .map(mass => fuelRequired(mass))
+  .reduce((acc, fuel) => acc + totalFuelRequiredPerMass(fuel, fuel));
 
-const totalFuel = fuelRequirementsPerModule.reduce((acc, fuel) => {
-  return acc + totalFuelRequiredPerMass(fuel, fuel);
-}, 0)
-
-console.log(totalFuel);
+console.log(result);
