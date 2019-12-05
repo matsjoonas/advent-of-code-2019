@@ -15,6 +15,8 @@ function setCharAt(str, index, chr) {
 
 let iStr,
   index0;
+  re3 = /([1-9\d])\1\1/,
+  re2 = /([1-9\d])\1/;
 
 for (let i = input[0]; i <= input[1]; i++) {
   iStr = '' + i;
@@ -29,9 +31,12 @@ for (let i = input[0]; i <= input[1]; i++) {
     }
   }
 
-  // check if two consecutive digits are the samec
+  const chars = iStr.split('');
+
   for (let j = 0; j < length; j++) {
-    if (iStr[j] === iStr[j + 1]) {
+    // this works because two matching caharacters can only appear consecutively, otherwise
+    // the no decending rule would be violated
+    if (chars.filter(char => char === iStr[j]).length === 2) {
       passwordCandidates.push(iStr);
       break;
     }
@@ -39,5 +44,7 @@ for (let i = input[0]; i <= input[1]; i++) {
 
   i = +iStr;
 }
+
+passwordCandidates
 
 console.log(passwordCandidates.length);
