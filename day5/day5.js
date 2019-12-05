@@ -7,7 +7,7 @@ const fs = require('fs');
 * 03 - 
 */
 
-const INPUT = 1;
+const INPUT = 5;
 const OUTPUTS = [];
 
 function getModesAndOpcode(value) {
@@ -51,7 +51,7 @@ function getInput2(mode, value, intcode) {
 
 
 function executeInstruction(intcode, pointer) {
-  let nrOfValues;
+  let newPointer;
 
   const { mode, opcode } = getModesAndOpcode(intcode[pointer]);
 
@@ -60,23 +60,53 @@ function executeInstruction(intcode, pointer) {
   }
 
   const param1 = getInput1(mode, intcode[pointer + 1], intcode);
-  const param2 =  getInput2(mode, intcode[pointer + 2], intcode);
+  const param2 = getInput2(mode, intcode[pointer + 2], intcode);
 
   if (opcode === 1) {
     intcode[intcode[pointer + 3]] = param1 + param2;
-    nrOfValues = 4;
+    newPointer = pointer + 4;
   } else if (opcode === 2) {
     intcode[intcode[pointer + 3]] = param1 * param2;
-    nrOfValues = 4;
+    newPointer = pointer + 4;
   } else if (opcode === 3) {
     intcode[intcode[pointer + 1]] = INPUT;
-    nrOfValues = 2;
+    newPointer = pointer + 2;
   } else if (opcode === 4) {
-    nrOfValues = 2;
+    newPointer = pointer + 2;
     OUTPUTS.push(intcode[intcode[pointer + 1]]);
+  } else if (opcode === 5) {
+    if (param1 !== 0) {
+      newPointer = param2;
+    } else {
+      newPointer = pointer + 3;
+    }
+  } else if (opcode === 6) {
+    if (param1 === 0) {
+      newPointer = param2;
+    } else {
+      newPointer = pointer + 3;
+    }
+  } else if (opcode === 7) {
+    if (param1 < param2) {
+      intcode[intcode[pointer + 3]] = 1;
+    } else {
+      intcode[intcode[pointer + 3]] = 0;
+    }
+    newPointer = pointer + 4;
+  } else if (opcode === 8) {
+    if (param1 === param2) {
+      intcode[intcode[pointer + 3]] = 1;
+    } else {
+      intcode[intcode[pointer + 3]] = 0;
+    }
+    newPointer = pointer + 4;
+  } else {
+    console.log('unrecognized opcode: ' + opcode);
+    return 'halt';
   }
 
-  return nrOfValues;
+
+  return newPointer;
 }
 
 fs.readFile('./input.txt', (e, data) => {
@@ -84,17 +114,17 @@ fs.readFile('./input.txt', (e, data) => {
     .split(',')
     .map(value => parseInt(value));
 
-  let nrOfValues;
-
-  for (let i = 0; i < intcode.length; i++) {
-    if (nrOfValues === 'halt') {
+  let newPointer;
+  for (let i = 0; i < intcode.length; i = newPointer) {
+    if (newPointer === 'halt') {
       break;
     }
-    nrOfValues = executeInstruction(intcode, i)
-    i += (nrOfValues - 1);
+
+    newPointer = executeInstruction(intcode, i);
   }
 
   console.log(OUTPUTS);
 });
+
 
 
