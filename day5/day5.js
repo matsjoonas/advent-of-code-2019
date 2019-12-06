@@ -113,7 +113,6 @@ fs.readFile('./input.txt', (e, data) => {
   const intcode = data.toString()
     .split(',')
     .map(value => parseInt(value));
-
   let newPointer;
   for (let i = 0; i < intcode.length; i = newPointer) {
     if (newPointer === 'halt') {
