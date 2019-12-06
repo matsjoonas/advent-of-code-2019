@@ -16,25 +16,53 @@ fs.readFile('./input.txt', (e, data) => {
       return item.split(')');
     });
 
-  const paths = [];
+
 
   const startingNode = input.find(node => node[0] === 'COM');
-  let count = 0;
+  const termninalNodes = [];
 
-  function traverse(input, thisNode) {
+  function getTerminalNodes(input, thisNode) {
     const nextNodes = input.filter(node => node[0] === thisNode[1]);
-    count++;
-    console.log(thisNode);
     if (!nextNodes.length) {
-      return;;
+      termninalNodes.push(thisNode);
+      return;
     } else {
       return nextNodes.forEach(nextNode => {
-        return traverse(input, nextNode);
+        return getTerminalNodes(input, nextNode);
       });
     }
   }
 
-  traverse(input, startingNode);
-  console.log(count);
+  getTerminalNodes(input, startingNode);
+  const paths = [];
 
+  function getPath(input, thisNode, path = []) {
+    path.push(thisNode);
+    const nextNode = input.find(nextNode => nextNode[1] === thisNode[0])
+    if (!nextNode) {
+      return path;
+    } else {
+      return getPath(input, nextNode, path);
+    }
+  };
+
+  termninalNodes.forEach(thisNode => {
+    paths.push(getPath(input, thisNode).reverse());
+  });
+
+  let totalOrbits = 0;
+
+  input.forEach(node => {
+    const path = paths.find(path => {
+      return path.find(pathNode => pathNode.join() === node.join());
+    });
+
+    const index = path.findIndex(pathNode => pathNode.join() === node.join());
+
+    if (index > -1) {
+      totalOrbits += index + 1;
+    }
+  });
+
+  console.log(totalOrbits);
 });
